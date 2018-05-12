@@ -14,11 +14,11 @@ apt-get install docker-compose -y
 
 #Certs
 mkdir $dir/certs # maybe load with folder
-openssl genrsa -out $dir/certs/root-ca.key 2048
+openssl genrsa -out $dir/certs/root.key 2048
 openssl req -x509 -new\
-        -key $dir/certs/root-ca.key\
+        -key $dir/certs/root.key\
         -days 365\
-        -out $dir/certs/root-ca.crt\
+        -out $dir/certs/root.crt\
         -subj '/C=UA/ST=Kharkiv/L=Kharkiv/O=NURE/OU=Mirantis/CN=rootCA'
 
 openssl genrsa -out $dir/certs/web.key 2048
@@ -29,9 +29,9 @@ openssl req -new\
         -subj "/C=UA/ST=Kharkiv/L=Karkiv/O=NURE/OU=Mirantis/CN=$(hostname -f)"
 
 
-openssl x509 -req -extfile <(printf "subjectAltName=IP:${EXTERNAL_IP},DNS:${HOST_NAME}") -days 365 -in $dir/certs/web.csr -CA $dir/certs/root-ca.crt -CAkey $dir/certs/root-ca.key -CAcreateserial -out $dir/certs/web.crt
+openssl x509 -req -extfile <(printf "subjectAltName=IP:${EXTERNAL_IP},DNS:${HOST_NAME}") -days 365 -in $dir/certs/web.csr -CA $dir/certs/root.crt -CAkey $dir/certs/root.key -CAcreateserial -out $dir/certs/web.crt
 
-cat $dir/certs/web.crt $dir/certs/root-ca.crt > $dir/certs/web-bundle.crt
+cat $dir/certs/web.crt $dir/certs/root.crt > $dir/certs/web-bundle.crt
 
 #Make directory for logs
 mkdir -p $NGINX_LOG_DIR
@@ -47,16 +47,8 @@ services:
      - $dir/etc:/etc/nginx/conf.d
      - $dir/certs:/etc/ssl/certs
      - $NGINX_LOG_DIR:/var/log/nginx
-    networks:
-     - netname
   apache:
-    image: $APACHE_IMAGE
-    ports:
-     - "80:80"
-    networks:
-     - netname
-networks:
-  netname:" > $dir/docker-compose.yml
+    image: $APACHE_IMAGE" > $dir/docker-compose.yml
 
 #UP
 cd $dir

@@ -3,19 +3,10 @@ services:
   nginx:
     image: nginx:1.13
     ports:
-     - "443:17080"
+     - 17080:443
     volumes:
-     - /root/etc:/etc/nginx/conf.d
-     - /root/certs:/etc/ssl/certs
+     - /home/user/task10_12_2/etc:/etc/nginx/conf.d
+     - /home/user/task10_12_2/certs:/etc/ssl/certs
      - /srv/log/nginx:/var/log/nginx
-    networks:
-     - net1
   apache:
     image: httpd:2.4
-    ports:
-     - "80:80"
-    networks:
-     - net1
-networks:
-  net1:
-
